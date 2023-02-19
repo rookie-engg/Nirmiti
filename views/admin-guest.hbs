@@ -1,0 +1,188 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link active" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+
+<main id="main" class="main">
+
+
+  <div class="pagetitle">
+    <h1>Add Guest Customer</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Fill With Caution</h5>
+
+            {{#if insertSuccess}}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            {{#if insertFail}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-octagon me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            <script type="module">
+              // setTimeout(() => document.querySelectorAll('button[data-bs-dismiss=alert]').forEach(b => b.click()), 3500);
+            </script>
+
+            <!-- General Form Elements -->
+            <form action="/admin/guest/add" method="post">
+
+              <div class="row mb-3">
+                <label class="col-sm-2" for="name">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" placeholder="name" aria-label="Name" id="name" name="name"
+                    required autofocus>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                  <input type="email" class="form-control" name="email" id="email" placeholder="your email" />
+                </div>
+              </div>
+
+              <h3>Payment</h3>
+              <hr>
+
+              <div class="row mb-3">
+                <label for="payamount" class="col-sm-2 col-form-label">Pay Amount</label>
+                <div class="col-sm-10">
+                  <input type="number" class="form-control" placeholder="Amount" id="payamount" name="payamount"
+                    value="2400.00" required />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="paymode">Pay Mode</label>
+                <div class="col-sm-10">
+                  <select class="form-select" aria-label="Default select example" name="paymode" id="paymode" required>
+                    <option value="cash" selected>Cash</option>
+                    <option value="online">Online</option>
+                  </select>
+                </div>
+              </div>
+
+
+              <div class="row mb-3" id="txnrow">
+                <label class="col-sm-2 col-form-label" for="txnid">Txn ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" placeholder="Transaction ID" id="txnid" name="txnid" required
+                    disabled>
+                </div>
+                <script>
+                  (() => {
+                    const txnrow = document.querySelector('#txnrow');
+                    const txnid = document.querySelector('#txnid');
+                    const paymode = document.querySelector('#paymode');
+
+                    paymode.addEventListener('change', () => {
+                      if (paymode.value == 'online') {
+                        txnid.removeAttribute('disabled');
+                        txnid.focus();
+                      } else {
+                        txnid.setAttribute('disabled', 'true');
+                      }
+                    })
+                  })();
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label for="payDate" class="col-sm-2 col-form-label">Pay Date</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" name="paydate" id="paydate" required />
+                </div>
+                <script>
+                  (() => {
+                    const payDate = document.querySelector('input[id=paydate]');
+                    const d = new Date().toISOString().split(':')[0].slice(0, 10);
+                    payDate.defaultValue = d;
+                    payDate.setAttribute('max', d);
+                  })();
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Submit Button</label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary" id='submitBtn'>Submit Form</button>
+                </div>
+              </div>
+
+            </form><!-- End General Form Elements -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

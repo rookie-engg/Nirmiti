@@ -1,0 +1,247 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update" class="active">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Update Customer</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Fill With Caution</h5>
+
+            {{#if updateSuccess}}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            {{#if updateFail}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-octagon me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            <script type="module">
+              // setTimeout(() => document.querySelectorAll('button[data-bs-dismiss=alert]').forEach(b => b.click()), 3500);
+            </script>
+
+            <!-- General Form Elements -->
+            <form action="/admin/customer/update/profile?ugnumber={{data.ug_number}}" method="post">
+              <div class="row mb-3">
+                <label for="ugnumber" class="col-sm-2 col-form-label">UG Number</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="ugnumber" name="ugnumber" value="{{data.ug_number}}"
+                    maxlength="20" required autofocus />
+                  <div class="invalid-feedback">Already Exists</div>
+                  <div class="valid-feedback"></div>
+                </div>
+              </div>
+
+              {{!-- <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">Mess Type</legend>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="status" id="TgridRadios2" value="active" {{#if
+                      data.Subscription.active}} checked="checked" {{/if}}>
+                    <label class="form-check-label" for="TgridRadios2">
+                      Active
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="status" id="TgridRadios1" value="inactive" {{#if
+                      data.Subscription.inactive }} checked="checked" {{/if}}>
+                    <label class="form-check-label" for="TgridRadios1">
+                      Inactive
+                    </label>
+                  </div>
+                </div>
+              </fieldset> --}}
+
+              <div class="row mb-3">
+                <label class="col-sm-2" for="firstname">Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Firstname" aria-label="Firstname"
+                      id="firstname" name="firstname" required value="{{data.first_name}}">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" placeholder="Surname" aria-label="Surname" name="surname"
+                      id="surname" required value="{{data.last_name}}">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="phone" class="col-sm-2 col-form-label">Personel Phone</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text">+91</span>
+                    <input type="number" class="form-control" name="phone" id="phone" minlength="10" maxlength="10"
+                      required value="{{data.Contact.phone}}" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                  <input type="email" class="form-control" name="email" id="email" value="{{data.Contact.email}}" />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2" for="guardianFirstname">Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Guardian Firstname" aria-label="Firstname"
+                      id="guardianFirstname" name="guardianFirstname" value="{{data.guardian_firstname}}" required>
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" placeholder="Guardian Surname" aria-label="Surname"
+                      name="guardianSurname" id="guardianSurname" value="{{data.guardian_surname}}" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="guardianPhone" class="col-sm-2 col-form-label">Guardian Phone</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text">+91</span>
+                    <input type="number" class="form-control" name="guardianPhone" id="guardianPhone" minlength="10"
+                      maxlength="10" required value="{{data.Contact.guardian_phone}}" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="joinDate" class="col-sm-2 col-form-label">Join Date</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" name="joinDate" id="joinDate" required />
+                </div>
+                <script>
+                  (() => {
+                    const joinDate = document.querySelector('input[id=joinDate]');
+                    const d = new Date().toISOString().split(':')[0].slice(0, 10);
+                    joinDate.defaultValue = '{{data.joining_date}}';
+                    joinDate.setAttribute('max', d);
+                  })();
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label for="address" class="col-sm-2 col-form-label">Address</label>
+                <div class="col-sm-10">
+                  <textarea class="form-control" style="height: 100px" name="address" id="address"
+                    maxlength="255">{{data.Contact.address}}</textarea>
+                </div>
+              </div>
+
+              <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">Mess Type</legend>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="messType" id="TgridRadios2" value="lunch-dinner"
+                      {{#if data.Subscription.both }} checked="checked" {{/if}}>
+                    <label class="form-check-label" for="TgridRadios2">
+                      Both Lunch & Dinner
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="messType" id="TgridRadios1" value="lunch" {{#if
+                      data.Subscription.single }} checked="checked" {{/if}}>
+                    <label class="form-check-label" for="TgridRadios1">
+                      Only Lunch
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">Mess Plan</legend>
+                <div class="col-sm-10">
+                  <input class="form-control" type="number" name="messPlan" id="gridRadios1"
+                    value="{{data.Subscription.number_of_days}}">
+                </div>
+              </fieldset>
+
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Submit Button</label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary" id='submitBtn'>Submit Form</button>
+                </div>
+              </div>
+
+            </form><!-- End General Form Elements -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

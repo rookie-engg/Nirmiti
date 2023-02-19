@@ -1,0 +1,134 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments" class="active">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+<main class="main" id="main">
+  <div class="pagetitle">
+    <h1>Payments</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Customer</h5>
+            <table class="table">
+              <tr>
+                <td><b>Reg Number</b></td>
+                <td>{{data.ug_number}}</td>
+              </tr>
+              <tr>
+                <td><b>Name</b></td>
+                <td>{{data.first_name}} {{data.last_name}}</td>
+              </tr>
+            </table>
+            <!-- Default Table -->
+            <table id="payments-table" class="table table-striped" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Raw Date</th>
+                  <th scope="col">Readable PayDate</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Mode</th>
+                  <th scope="col">Transaction id</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+            <!-- End Default Table Example -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.2.1/+esm';
+
+  const table = $('#payments-table').DataTable({
+    ajax: {
+      url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
+      method: 'get',
+      dataSrc: 'data'
+    },
+    scrollX: true,
+    order: [['0', 'desc']],
+    columns: [
+      {
+        data: 'payment_date',
+      },
+      {
+        render(data, type, row, meta) {
+          return DateTime.fromSQL(row.payment_date).toFormat('MMMM dd, yyyy');
+        }
+      },
+      {
+        data: 'amount'
+      },
+      {
+        data: 'mode'
+      },
+      {
+        data: 'txnid'
+      }
+    ]
+  });
+</script>

@@ -1,0 +1,507 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add" class="active">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+
+<main id="main" class="main">
+
+
+  <div class="pagetitle">
+    <h1>Add Customer</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Fill With Caution</h5>
+
+            {{#if insertSuccess}}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            {{#if insertFail}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-octagon me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            <script type="module">
+              // setTimeout(() => document.querySelectorAll('button[data-bs-dismiss=alert]').forEach(b => b.click()), 3500);
+            </script>
+
+            <!-- General Form Elements -->
+            <form action="/admin/customer/add" method="post">
+              <div class="row mb-3">
+                <label for="ugnumber" class="col-sm-2 col-form-label">UG-Number</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="ugnumber" name="ugnumber" maxlength="20" required
+                    autofocus />
+                  <div class="invalid-feedback">Already Exists</div>
+                  <div class="valid-feedback"></div>
+                </div>
+                <script type="module">
+                  const ugnumber = document.querySelector('#ugnumber');
+                  const submitBtn = document.querySelector('#submitBtn');
+
+                  ugnumber.addEventListener('input', (_ev) => {
+                    ugnumber.value = ugnumber.value.toUpperCase();
+                  })
+
+                  ugnumber.addEventListener('focusout', async (ev) => {
+                    if (ugnumber.value === '') return;
+                    const res = await fetch(`/admin/customer/exists?ugnumber=${ugnumber.value}`, {
+                      method: 'GET',
+                      headers: {
+                        'Accept': 'application/json'
+                      }
+                    });
+
+                    if (res.status !== 200) {
+                      alert('Error fetching ugnumber list');
+                      console.error(await res.json());
+                      return;
+                    }
+
+                    const exists = (await res.json()).exists;
+                    if (exists) {
+                      ugnumber.classList.remove('is-valid');
+                      ugnumber.classList.add('is-invalid');
+                      submitBtn.setAttribute('disabled', 'disabled');
+                    } else {
+                      submitBtn.removeAttribute('disabled');
+                      ugnumber.classList.add('is-valid');
+                      ugnumber.classList.remove('is-invalid');
+                    }
+                  });
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2" for="firstname">Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Firstname" aria-label="Firstname"
+                      id="firstname" name="firstname" required>
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" placeholder="Surname" aria-label="Surname" name="surname"
+                      id="surname" required>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="row mb-3">
+                <label for="phone" class="col-sm-2 col-form-label">Personel Phone</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text">+91</span>
+                    <input type="number" class="form-control" name="phone" id="phone" minlength="10" maxlength="10"
+                      required />
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                  <input type="email" class="form-control" name="email" id="email" />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="inputNumber" class="col-sm-2 col-form-label">Photo Upload</label>
+                <div class="col-sm-10">
+                  <input class="form-control" type="file" id="formFile" disabled>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2" for="guardianFirstname">Name</label>
+                <div class="col-sm-10">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Guardian Firstname" aria-label="Firstname"
+                      id="guardianFirstname" name="guardianFirstname" required>
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" placeholder="Guardian Surname" aria-label="Surname"
+                      name="guardianSurname" id="guardianSurname" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="guardianPhone" class="col-sm-2 col-form-label">Guardian Phone</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text">+91</span>
+                    <input type="number" class="form-control" name="guardianPhone" id="guardianPhone" minlength="10"
+                      maxlength="10" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="joinDate" class="col-sm-2 col-form-label">Join Date</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" name="joinDate" id="joinDate" required />
+                </div>
+                <script>
+                  (() => {
+                    const joinDate = document.querySelector('input[id=joinDate]');
+                    const d = new Date().toISOString().split(':')[0].slice(0, 10);
+                    joinDate.defaultValue = d;
+                    joinDate.setAttribute('max', d);
+                  })();
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label for="address" class="col-sm-2 col-form-label">Address</label>
+                <div class="col-sm-10">
+                  <textarea class="form-control" style="height: 100px" name="address" id="address"
+                    maxlength="255"></textarea>
+                </div>
+              </div>
+
+              <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">Mess Type</legend>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="messType" id="TgridRadios2" value="lunch-dinner"
+                      checked="checked">
+                    <label class="form-check-label" for="TgridRadios2">
+                      Both Lunch & Dinner
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="messType" id="TgridRadios1" value="lunch">
+                    <label class="form-check-label" for="TgridRadios1">
+                      Only Lunch
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">Mess Plan</legend>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="messPlan" id="gridRadios1" value="one-month"
+                      checked="checked">
+                    <label class="form-check-label" for="gridRadios1">
+                      One Month
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <label class="form-check-label" for="gridRadios3">
+                      Custom Days
+                    </label>
+                    <input class="form-check-input" type="radio" name="messPlan" id="gridRadios3">
+                    <input class="form-control" type="number" id="customMessPlan" disabled>
+                    <div class="row mb-3 mt-2">
+                      <label for="pricePerPlate" class="col-sm-2 col-form-label"><i
+                          class="bi bi-currency-rupee"></i>Price Per Plate</label>
+                      <div class="col-sm-10">
+                        <input type="number" class="form-control" name="pricePerPlate" id="pricePerPlate" value="40" />
+                      </div>
+                      <script type="module">
+                        const customBtn = document.querySelector('#gridRadios3');
+                        const customMessDays = document.querySelector('#customMessPlan');
+                        const payamount = document.querySelector('#payamount');
+                        const pricePerPlate = document.querySelector('#pricePerPlate');
+
+                        document.querySelectorAll('input[type=radio][name=messPlan]').forEach((btn) => {
+                          btn.addEventListener('change', (ev) => {
+                            if (customBtn.checked) {
+                              customMessDays.removeAttribute('disabled');
+                              customMessDays.focus();
+                            } else {
+                              customMessDays.setAttribute('disabled', 'true');
+                            }
+                          });
+
+                          const messTypes = Array.from(document.querySelectorAll('input[name=messType]'));
+                          const messPlan = Array.from(document.querySelectorAll('input[name=messPlan]'));
+
+                          [customMessDays, pricePerPlate, ...messTypes, ...messPlan].forEach(ele => {
+                            ele.addEventListener('change', (ev) => {
+                              if (customBtn.checked) {
+                                if (!customMessDays.value) {
+                                  customMessDays.value = 30;
+                                }
+                                customBtn.value = customMessDays.value;
+                              }
+
+                              if (!pricePerPlate.value) {
+                                pricePerPlate.value = 40;
+                              }
+
+                              let days = customMessDays.value;
+                              let multipler = 2;
+
+                              document.querySelectorAll('input[name=messType]').forEach((ele => {
+                                if (!ele.checked) return;
+
+                                if (ele.value === 'lunch') multipler = 1;
+
+                              }));
+
+                              document.querySelectorAll('input[name=messPlan]').forEach(ele => {
+                                if (!ele.checked) return;
+
+                                if (ele.value === 'one-month') days = 30;
+                              });
+
+                              payamount.value = multipler * Number.parseFloat(pricePerPlate.value) * days;
+                            });
+                          });
+
+                          customMessDays.addEventListener('focus', () => {
+                            if (!customBtn.checked)
+                              customBtn.click();
+                          })
+                        })
+                      </script>
+                    </div>
+                  </div>
+              </fieldset>
+
+              <h3>Payment</h3>
+              <hr>
+
+              <div class="row mb-3">
+                <label for="payamount" class="col-sm-2 col-form-label">Total Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Amount" id="payamount" name="payamount"
+                      value="2400" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="remaningAmount" class="col-sm-2 col-form-label">Paid Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Paid Amount" id="paidAmount"
+                      name="paidAmount" value="2400" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="remaningAmount" class="col-sm-2 col-form-label">Remaning Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Remaning Amount" id="remaningAmount"
+                      name="remaningAmount" value="0" required />
+                  </div>
+                </div>
+              </div>
+
+              <script type="module">
+                const paidAmount = document.querySelector('#paidAmount');
+                const remaningAmount = document.querySelector('#remaningAmount');
+                const payAmount = document.querySelector('#payamount');
+
+                payamount.addEventListener('input', (ev) => {
+                  paidAmount.value = payAmount.value;
+                  remaningAmount.value = 0;
+                });
+
+                [paidAmount, remaningAmount].forEach(ele => {
+                  ele.addEventListener('input', (ev) => {
+
+                    const total = Number.parseFloat(payAmount.value);
+                    let paid = Number.parseFloat(paidAmount.value);
+                    let remaning = Number.parseFloat(remaningAmount.value);
+
+                    if (paid > total) {
+                      paid = total;
+                    }
+
+                    if (paid < 0) {
+                      paid = 0;
+                    }
+
+                    if (remaning < 0) {
+                      remaning = 0;
+                      paid = total;
+                    }
+
+                    remaning = total - paid;
+
+                    paidAmount.value = paid;
+                    remaningAmount.value = remaning;
+                  });
+                });
+              </script>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="paymode">Pay Mode</label>
+
+                <div class="col-sm-10" id="paymentOptionsWrapper">
+                  <div class="row mb-3">
+                    <div class="col-sm-2">
+                      <select class="form-select" aria-label="Default select example" name="paymode" id="paymode"
+                        required>
+                        <option value="cash" selected>Cash</option>
+                        <option value="online">Online</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-2">
+                      <input type="number" class="form-control" required>
+                    </div>
+                    <div class="col-sm-2">
+                      <button class="btn btn-success" onclick="addPaymentOptions()"><i class="bi bi-plus"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                  const paymentOptionsWrapper = document.querySelector('#paymentOptionsWrapper');
+                  function addPaymentOptions() {
+                    const div = document.createElement('div');
+                    div.classList.add('row', 'mb-3');
+
+                    div.innerHTML = `
+                      <div class="col-sm-2">
+                        <select class="form-select" aria-label="Default select example" name="paymode" id="paymode"
+                          required>
+                          <option value="cash" selected>Cash</option>
+                          <option value="online">Online</option>
+                        </select>
+                      </div>
+                      <div class="col-sm-2">
+                        <input type="number" class="form-control" required>
+                      </div>
+                      <div class="col-sm-2">
+                        <button class="btn btn-success" onclick="addPaymentOptions()"><i class="bi bi-plus"></i></button>
+                      </div>
+                    `;
+                    paymentOptionsWrapper.append(div);
+                  }
+                </script>
+              </div>
+
+
+              <div class="row mb-3" id="txnrow">
+                <label class="col-sm-2 col-form-label" for="txnid">Txn ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" placeholder="Transaction ID" id="txnid" name="txnid" required
+                    disabled>
+                </div>
+                <script type="module">
+
+                  const txnrow = document.querySelector('#txnrow');
+                  const txnid = document.querySelector('#txnid');
+                  const paymode = document.querySelector('#paymode');
+
+                  paymode.addEventListener('change', () => {
+
+                    if (paymode.value == 'online' || paymode.value == 'online-cash') {
+                      txnid.removeAttribute('disabled');
+                      txnid.focus();
+                    } else {
+                      txnid.setAttribute('disabled', 'true');
+                    }
+
+                  })
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label for="payDate" class="col-sm-2 col-form-label">Pay Date</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" name="paydate" id="paydate" required />
+                </div>
+                <script type="module">
+
+                  const payDate = document.querySelector('input[id=paydate]');
+                  const d = new Date().toISOString().split(':')[0].slice(0, 10);
+                  payDate.defaultValue = d;
+                  payDate.setAttribute('max', d);
+
+                </script>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Submit Button</label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary" id='submitBtn' disabled>Submit Form</button>
+                </div>
+              </div>
+
+            </form><!-- End General Form Elements -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

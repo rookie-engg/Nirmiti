@@ -1,0 +1,238 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table" class="active">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Customers List</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Default Table</h5>
+            <!-- Default Table -->
+            <table id="customer-table" class="table table-striped" style="width:100%">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Renew Date</th>
+                  <th scope="col">Remaining Days</th>
+                  <th scope="col">Expected End Date</th>
+                </tr>
+              </thead>
+            </table>
+            <!-- End Default Table Example -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.2.1/+esm';
+
+  const table = $('#customer-table').DataTable({
+    ajax: {
+      url: '/admin/customer/list',
+      method: 'get',
+      dataSrc: 'data'
+    },
+    scrollX: true,
+    scrollY: true,
+    order: [[0, 'asc']],
+    columns: [
+      {
+        className: 'dt-control',
+        orderable: false,
+        data: null,
+        defaultContent: '',
+      },
+      {
+        render(data, type, row, meta) {
+          return `
+          <div class="d-flex gap-1">
+            <a class="btn btn-success" title="Update Customer Profile"
+             href="/admin/customer/update/show?ugnumber=${row.ug_number}">
+              <div class="d-flex gap-1 justifu-content-center align-items-center">
+                <i class="bi bi-arrow-repeat"></i>
+                {{!-- <span>update</span> --}}
+              </div>
+            </a>
+            <a class="btn btn-primary" title="List Customer Payments"
+            href="/admin/customer/payments/show?ugnumber=${row.ug_number}">
+             <div class="d-flex gap-1 justifu-content-center align-items-center">
+                <i class="bi bi-currency-rupee"></i>
+                {{!-- <span>Payments</span> --}}
+              </div>
+            <a>
+          </div>
+          `;
+        }
+      },
+      { data: 'ug_number' },
+      {
+        render(data, type, row, meta) {
+          return `${row.first_name} ${row.last_name}`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return DateTime.fromSQL(row.Subscription.renew_date).toFormat('MMMM dd, yyyy');
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `${row.Subscription.remaining_days}`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          const d = DateTime.now();
+          return d
+            .plus({ days: row.Subscription.remaining_days })
+            .toFormat('MMMM dd, yyyy');
+        }
+      },
+    ]
+  });
+
+  $('#customer-table tbody').on('click', 'td.dt-control', async function () {
+    const tr = $(this).closest('tr');
+    const row = table.row(tr);
+
+    if (row.child.isShown()) {
+      row.child.hide();
+      tr.removeClass('show');
+    } else {
+      // Open this row
+      row.child(await format(row.data())).show();
+      tr.addClass('shown');
+    }
+  });
+
+  async function format(row) {
+    const response = await fetch(`/admin/customer/info?ugnumber=${row.ug_number}`);
+
+    row = await response.json();
+
+    return `
+      <table class="table">
+        <tr>
+          <td><b>Contact<b></td>
+          <td>
+            <table>
+              <tr>
+                <td>Phone</th>
+                  <td>${row.Contact.phone}</td>
+              </tr>
+              <tr>
+                  <td>Email</th>
+                  <td>${row.Contact.email}</td>
+              </tr>
+              <tr>
+                <td>Guardian Phone</th>
+                <td>${row.Contact.guardian_phone}</td>
+              </tr>
+                <tr>
+                <td>Address</th>
+                  <td>${row.Contact.address}</td>
+                </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td><b>Subscription</b></td>
+          <td>
+            <table>
+              <tr>
+                <td>Number of days</td>
+                <td>${row.Subscription.number_of_days}</td>
+              </tr>
+              <tr>
+                <td>Remaning Days</td>
+                <td>${row.Subscription.remaining_days}</td>
+              </tr>
+              <tr>
+                <td>Renew Date</td>
+                <td>${row.Subscription.renew_date}</td>
+              </tr>
+              <tr>
+                <td>Status</td>
+                <td>${row.Subscription.status}</td>
+              </tr>
+              <tr>
+                <td>Subscription Type</td>
+                <td>${row.Subscription.sub_type}</td>
+              </tr>
+            </table>
+        </tr>
+        <tr>
+          <td><b>Joining Date</b></td>
+          <td>${row.joining_date}</td>
+        </tr>
+      </table>
+    `;
+  }
+</script>
