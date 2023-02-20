@@ -75,11 +75,20 @@ Payment.init({
       isDate: true,
     },
   },
-  amount: {
+  total_amount: {
     type: DataTypes.FLOAT(6, 2),
     allowNull: false,
     validate: {
       notNull: true,
+      isFloat: true,
+    },
+  },
+  paid_amount: {
+    type: DataTypes.FLOAT(6, 2),
+    allowNull: false,
+    validate: {
+      notNull: true,
+      isFloat: true,
     },
   },
   status: {

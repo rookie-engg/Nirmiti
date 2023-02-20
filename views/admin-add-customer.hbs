@@ -361,95 +361,30 @@
                   <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
                     <input type="number" class="form-control" placeholder="Remaning Amount" id="remaningAmount"
-                      name="remaningAmount" value="0" required />
+                      name="remaningAmount" value="0" readonly />
                   </div>
                 </div>
               </div>
-
-              <script type="module">
-                const paidAmount = document.querySelector('#paidAmount');
-                const remaningAmount = document.querySelector('#remaningAmount');
-                const payAmount = document.querySelector('#payamount');
-
-                payamount.addEventListener('input', (ev) => {
-                  paidAmount.value = payAmount.value;
-                  remaningAmount.value = 0;
-                });
-
-                [paidAmount, remaningAmount].forEach(ele => {
-                  ele.addEventListener('input', (ev) => {
-
-                    const total = Number.parseFloat(payAmount.value);
-                    let paid = Number.parseFloat(paidAmount.value);
-                    let remaning = Number.parseFloat(remaningAmount.value);
-
-                    if (paid > total) {
-                      paid = total;
-                    }
-
-                    if (paid < 0) {
-                      paid = 0;
-                    }
-
-                    if (remaning < 0) {
-                      remaning = 0;
-                      paid = total;
-                    }
-
-                    remaning = total - paid;
-
-                    paidAmount.value = paid;
-                    remaningAmount.value = remaning;
-                  });
-                });
-              </script>
 
               <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="paymode">Pay Mode</label>
 
                 <div class="col-sm-10" id="paymentOptionsWrapper">
                   <div class="row mb-3">
-                    <div class="col-sm-2">
-                      <select class="form-select" aria-label="Default select example" name="paymode" id="paymode"
-                        required>
-                        <option value="cash" selected>Cash</option>
-                        <option value="online">Online</option>
-                      </select>
+                    <div class="col-sm-2 input-group">
+                      <span class="input-group-text">Cash&nbsp;&nbsp;</span>
+                      <input type="number" class="form-control" id="cash" name="cash">
                     </div>
-                    <div class="col-sm-2">
-                      <input type="number" class="form-control" required>
-                    </div>
-                    <div class="col-sm-2">
-                      <button class="btn btn-success" onclick="addPaymentOptions()"><i class="bi bi-plus"></i></button>
+                  </div>
+
+                  <div class="row mb-3">
+                    <div class="col-sm-2 input-group">
+                      <span class="input-group-text">online</span>
+                      <input type="number" class="form-control" id="online" name="online">
                     </div>
                   </div>
                 </div>
-                <script>
-                  const paymentOptionsWrapper = document.querySelector('#paymentOptionsWrapper');
-                  function addPaymentOptions() {
-                    const div = document.createElement('div');
-                    div.classList.add('row', 'mb-3');
-
-                    div.innerHTML = `
-                      <div class="col-sm-2">
-                        <select class="form-select" aria-label="Default select example" name="paymode" id="paymode"
-                          required>
-                          <option value="cash" selected>Cash</option>
-                          <option value="online">Online</option>
-                        </select>
-                      </div>
-                      <div class="col-sm-2">
-                        <input type="number" class="form-control" required>
-                      </div>
-                      <div class="col-sm-2">
-                        <button class="btn btn-success" onclick="addPaymentOptions()"><i class="bi bi-plus"></i></button>
-                      </div>
-                    `;
-                    paymentOptionsWrapper.append(div);
-                  }
-                </script>
               </div>
-
 
               <div class="row mb-3" id="txnrow">
                 <label class="col-sm-2 col-form-label" for="txnid">Txn ID</label>
@@ -457,23 +392,6 @@
                   <input type="text" class="form-control" placeholder="Transaction ID" id="txnid" name="txnid" required
                     disabled>
                 </div>
-                <script type="module">
-
-                  const txnrow = document.querySelector('#txnrow');
-                  const txnid = document.querySelector('#txnid');
-                  const paymode = document.querySelector('#paymode');
-
-                  paymode.addEventListener('change', () => {
-
-                    if (paymode.value == 'online' || paymode.value == 'online-cash') {
-                      txnid.removeAttribute('disabled');
-                      txnid.focus();
-                    } else {
-                      txnid.setAttribute('disabled', 'true');
-                    }
-
-                  })
-                </script>
               </div>
 
               <div class="row mb-3">
@@ -505,3 +423,41 @@
     </div>
   </section>
 </main>
+
+<script type="module">
+  const paidAmount = document.querySelector('#paidAmount');
+  const remaningAmount = document.querySelector('#remaningAmount');
+  const payAmount = document.querySelector('#payamount');
+
+  payamount.addEventListener('input', (ev) => {
+    paidAmount.value = payAmount.value;
+    remaningAmount.value = 0;
+  });
+
+  [paidAmount, remaningAmount].forEach(ele => {
+    ele.addEventListener('input', (ev) => {
+
+      const total = Number.parseFloat(payAmount.value);
+      let paid = Number.parseFloat(paidAmount.value);
+      let remaning = Number.parseFloat(remaningAmount.value);
+
+      if (paid > total) {
+        paid = total;
+      }
+
+      if (paid < 0) {
+        paid = 0;
+      }
+
+      if (remaning < 0) {
+        remaning = 0;
+        paid = total;
+      }
+
+      remaning = total - paid;
+
+      paidAmount.value = paid;
+      remaningAmount.value = remaning;
+    });
+  });
+</script>

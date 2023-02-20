@@ -17,7 +17,7 @@ export async function insertDummyData(run = 200) {
       guardian_surname: faker.name.lastName(),
       joining_date: faker.date.recent(),
       Contact: {
-        address: faker.address.streetAddress() + '\n\r' + faker.address.secondaryAddress() + '\n\r' + faker.address.streetAddress(),
+        address: faker.address.streetAddress() + '\n' + faker.address.secondaryAddress() + '\n' + faker.address.streetAddress(),
         email: faker.internet.email(),
         phone: faker.phone.number('##########'),
         guardian_phone: faker.phone.number('##########'),
@@ -29,19 +29,17 @@ export async function insertDummyData(run = 200) {
         sub_type: faker.helpers.arrayElement(['lunch', 'lunch-dinner']),
         status: 'active'
       },
-      Payments: [{
-        amount: amount,
-        cash: online,
-        online: Number.parseFloat(amount) - online,
-        payment_date: faker.date.recent(),
-        txnid: faker.random.alphaNumeric(10),
-      }, {
-        amount: amount,
-        cash: online,
-        online: Number.parseFloat(amount) - online,
-        payment_date: faker.date.recent(),
-        txnid: faker.random.alphaNumeric(10),
-      }]
+      Payments: new Array(15).fill(null).map(e => {
+        return {
+          total_amount: 2400,
+          paid_amount: amount,
+          cash: online,
+          status: amount ? 'pending' : 'complete',
+          online: Number.parseFloat(amount) - online,
+          payment_date: faker.date.recent(),
+          txnid: faker.random.alphaNumeric(10),
+        }
+      }),
     });
   }
 

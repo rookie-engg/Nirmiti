@@ -1,0 +1,183 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments" class="active">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/guest">
+        <i class="bi bi-ubuntu"></i>
+        <span>Guest</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+<main id="main" class="main">
+
+
+  <div class="pagetitle">
+    <h1>Payment Details</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Fill With Caution</h5>
+            <form action="/admin/customer/payment/update" method="post">
+              <input type="text" class="d-none" name="ugnumber" value="{{ugnumber}}">
+              <input type="text" class="d-none" name="id" value="{{id}}">
+              <div class="row mb-3">
+                <label for="payamount" class="col-sm-2 col-form-label">Total Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Amount" id="payamount" name="payamount"
+                      value="{{data.total_amount}}" oninput="handler()" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="remaningAmount" class="col-sm-2 col-form-label">Paid Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Paid Amount" id="paidAmount"
+                      name="paidAmount" value="{{data.paid_amount}}" oninput="handler()" required />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="remaningAmount" class="col-sm-2 col-form-label">Remaning Amount</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" class="form-control" placeholder="Remaning Amount" id="remaningAmount"
+                      name="remaningAmount" value="" readonly />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Status</label>
+                <div class="col-sm-10">
+                  <select class="form-select" name="status" required>
+                    <option value="complete" {{#if paymentomplete}} selected {{/if}}>Complete</option>
+                    <option value="pending" {{#if paymentPending}} selected {{/if}}>Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="paymode">Pay Mode</label>
+
+                <div class="col-sm-10" id="paymentOptionsWrapper">
+                  <div class="row mb-3">
+                    <div class="col-sm-2 input-group">
+                      <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                      <span class="input-group-text">Cash&nbsp;&nbsp;</span>
+                      <input type="number" class="form-control" id="cash" name="cash" value="{{data.cash}}">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <div class="col-sm-2 input-group">
+                      <span class="input-group-text"><i class="bi bi-currency-rupee"></i></span>
+                      <span class="input-group-text">online</span>
+                      <input type="number" class="form-control" id="online" name="online" value="{{data.online}}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3" id="txnrow">
+                <label class="col-sm-2 col-form-label" for="txnid">Txn ID</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" placeholder="Transaction ID" id="txnid" name="txnid" required
+                    value="{{data.txnid}}">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="payDate" class="col-sm-2 col-form-label">Pay Date</label>
+                <div class="col-sm-10">
+                  <input type="date" class="form-control" name="paydate" id="paydate" value="{{data.payment_date}}"
+                    required />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Submit Button</label>
+                <div class="col-sm-10">
+                  <button type="submit" class="btn btn-primary" id='submitBtn'>Submit Form</button>
+                </div>
+              </div>
+
+            </form><!-- End General Form Elements -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+  function handler() {
+
+    const total = Number.parseFloat(document.querySelector('#payamount').value);
+    const paid = Number.parseFloat(document.querySelector('#paidAmount').value);
+
+    const remaningAmount = document.querySelector('#remaningAmount');
+
+    remaningAmount.value = total - paid;
+  }
+  handler();
+</script>

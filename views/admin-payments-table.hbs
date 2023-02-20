@@ -68,6 +68,23 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Customer</h5>
+            
+            {{#if success}}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            {{#if err}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-octagon me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
             <table class="table">
               <tr>
                 <td><b>Reg Number</b></td>
@@ -82,11 +99,15 @@
             <table id="payments-table" class="table table-striped" style="width:100%">
               <thead>
                 <tr>
+                  <th></th>
                   <th>Raw Date</th>
                   <th scope="col">Readable PayDate</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Mode</th>
-                  <th scope="col">Transaction id</th>
+                  <th scope="col">Total Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Paid Amount</th>
+                  <th scope="col">Online</th>
+                  <th scope="col">Cash</th>
+                  <th scope="col">Remaning Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,7 +134,17 @@
     order: [['0', 'desc']],
     columns: [
       {
+        render(data, type, row, meta) {
+          return `
+            <a href="/admin/customer/payments/update?ugnumber={{data.ug_number}}&id=${row.id}" class="btn btn-success">
+              <i class="bi bi-arrow-repeat"></i>
+            </a>
+          `;
+        }
+      },
+      {
         data: 'payment_date',
+        className: 'd-none'
       },
       {
         render(data, type, row, meta) {
@@ -121,14 +152,44 @@
         }
       },
       {
-        data: 'amount'
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.total_amount}</span>`;
+        }
       },
       {
-        data: 'mode'
+        render(data, type, row, meta) {
+          return row.status.toUpperCase();
+        }
       },
       {
-        data: 'txnid'
-      }
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.paid_amount}</span>`;
+        }
+      },
+
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.online}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.cash}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          const total = Number.parseFloat(row.total_amount);
+          const paid = Number.parseFloat(row.paid_amount);
+          const remaning = total - paid;
+          return `<i class="bi bi-currency-rupee"></i><span>${remaning}</span>`;
+        }
+      },
     ]
   });
+
+  $.ajax({
+    url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
+    method: 'get',
+  }).done(rs => console.log(rs));
 </script>

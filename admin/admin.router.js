@@ -124,9 +124,9 @@ adminRouter.route('/customer/add')
     body('address').notEmpty().trim(),
     body('messType').notEmpty().trim(),
     body('messPlan').notEmpty().trim(),
+    body('remaningAmount').notEmpty().isFloat(),
     body('payamount').notEmpty().isNumeric().trim(),
     body('paydate').notEmpty().isDate().trim(),
-    body('paymode').notEmpty().trim(),
 
     async (req, res, next) => {
 
@@ -175,8 +175,12 @@ adminRouter.route('/customer/add')
 
           Payments: [{
             payment_date: req.body.paydate,
-            amount: req.body.payamount,
-            mode: req.body.paymode,
+            total_amount: req.body.payamount,
+            paid_amount: req.body.paidAmount,
+            cash: req.body.cash,
+            online: req.body.online,
+            remaning_amount: req.body.remaningAmount,
+            status: req.body?.remaningAmount ? 'pending' : 'complete',
             txnid: req.body.txnid,
           }],
         }, { include: [models.contact, models.subscription, models.payment] });
@@ -392,6 +396,133 @@ adminRouter.get('/customer/payments/list', async (req, res, next) => {
 
   }
 });
+
+adminRouter.get('/customer/payments/update', async (req, res, next) => {
+  const ugnumber = req.query?.ugnumber.toUpperCase();
+
+  if (!ugnumber) {
+    res.status(400).render('admin-customer-payments', {
+      err: true,
+      message: 'UG number not Provided'
+    });
+    return;
+  }
+
+  const id = req.query?.id;
+
+  if (!id) {
+    res.status(400).render('admin-customer-payments', {
+      err: true,
+      message: 'Payment ID not Provided'
+    });
+    return;
+  }
+
+  try {
+
+    const customer = await models.customer.findOne({
+      where: {
+        ug_number: ugnumber,
+      },
+      include: [models.payment],
+    });
+
+    const payment = await customer.getPayments({ where: { id } });
+
+    if (!payment.length > 0) {
+      res.status(400).render('admin-customer-payments', {
+        err: true,
+        message: 'Payment ID not Valid'
+      });
+      return;
+    }
+
+    res.status(200).render('admin-payment-form', {
+      id, ugnumber,
+      data: payment.map(p => p.toJSON()).at(0),
+      paymentComplete: payment[0].dataValues.status === 'complete' ? true : false,
+      paymentPending: payment[0].dataValues.status === 'pending' ? true : false,
+    });
+
+  } catch (err) {
+
+    res.status(500).render('admin-customer-payments', {
+      err: true,
+      message: err.message
+    });
+
+  }
+});
+
+adminRouter.post('/customer/payment/update',
+  body('id').notEmpty(),
+  body('ugnumber').notEmpty(),
+  body('payamount').notEmpty().isFloat(),
+  body('paidAmount').notEmpty().isFloat(),
+  body('remaningAmount').notEmpty().isFloat(),
+  body('paydate').isDate(),
+  async (req, res, next) => {
+
+    const customer = await models.customer.findOne({
+      where: { ug_number: req.body.ugnumber }
+    });
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).render('admin-payments-table', {
+        err: true,
+        message: errors.array().map(e => e.param + ':' + e.value).join(' <br> '),
+        data: customer.dataValues,
+        ugnumber: customer.dataValues.ug_number
+      });
+      console.table(errors.array());
+      return;
+    }
+    
+
+    try {
+      const payments = await customer.getPayments({
+        where: {
+          id: req.body.id
+        }
+      });
+
+      if (payments.length != 1) {
+        throw Error('Invalid Payment ID recieved');
+      }
+
+      const payment = payments[0];
+
+      payment.set({
+        payment_date: req.body.paydate,
+        total_amount: req.body.payamount,
+        paid_amount: req.body.paidAmount,
+        status: req.body.status,
+        online: req.body.online,
+        cash: req.body.cash,
+        txnid: req.body.txnid,
+      });
+
+      await payment.save();
+
+      res.status(200).render('admin-payments-table', {
+        success: true,
+        message: 'Payment with ID ' + req.body.id + ' update Successful',
+        data: customer.dataValues,
+        ugnumber: customer.dataValues.ug_number
+      });
+
+    } catch (err) {
+      res.status(500).render('admin-payments-table', {
+        err: true,
+        message: err.message,
+        data: customer.dataValues,
+        ugnumber: customer.dataValues.ug_number
+      });
+    }
+
+  });
+
 
 // --------- /customer Routes End ----------
 
