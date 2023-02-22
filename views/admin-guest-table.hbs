@@ -21,7 +21,7 @@
       <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
-      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/customer/add">
             <i class="bi bi-circle"></i><span>Add Customer</span>
@@ -39,7 +39,7 @@
         </li>
 
         <li>
-          <a href="/admin/customer/payments" class="active">
+          <a href="/admin/customer/payments">
             <i class="bi bi-circle"></i><span>Payments</span>
           </a>
         </li>
@@ -47,17 +47,17 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down  ms-auto"></i>
+      <a class="nav-link" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
-      <ul id="guest-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+      <ul id="guest-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/guest/add">
             <i class="bi bi-circle"></i><span>Add Guest</span>
           </a>
         </li>
         <li>
-          <a href="/admin/guest/table">
+          <a href="/admin/guest/table" class="active">
             <i class="bi bi-circle"></i><span>List Customer</span>
           </a>
         </li>
@@ -70,7 +70,7 @@
 
 <main class="main" id="main">
   <div class="pagetitle">
-    <h1>Payments</h1>
+    <h1>Guest Payments</h1>
   </div><!-- End Page Title -->
 
   <section class="section">
@@ -78,8 +78,8 @@
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Customer</h5>
-            
+            <h5 class="card-title">Guest</h5>
+
             {{#if success}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
@@ -96,16 +96,6 @@
             </div>
             {{/if}}
 
-            <table class="table">
-              <tr>
-                <td><b>Reg Number</b></td>
-                <td>{{data.ug_number}}</td>
-              </tr>
-              <tr>
-                <td><b>Name</b></td>
-                <td>{{data.first_name}} {{data.last_name}}</td>
-              </tr>
-            </table>
             <!-- Default Table -->
             <table id="payments-table" class="table table-striped" style="width:100%">
               <thead>
@@ -113,12 +103,9 @@
                   <th></th>
                   <th>Raw Date</th>
                   <th scope="col">Readable PayDate</th>
-                  <th scope="col">Total Amount</th>
-                  <th scope="col">Status</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Pay Mode</th>
                   <th scope="col">Paid Amount</th>
-                  <th scope="col">Online</th>
-                  <th scope="col">Cash</th>
-                  <th scope="col">Remaning Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,7 +124,7 @@
 
   const table = $('#payments-table').DataTable({
     ajax: {
-      url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
+      url: '/admin/guest/list',
       method: 'get',
       dataSrc: 'data'
     },
@@ -147,60 +134,37 @@
       {
         render(data, type, row, meta) {
           return `
-            <a href="/admin/customer/payments/update?ugnumber={{data.ug_number}}&id=${row.id}" class="btn btn-success">
-              <i class="bi bi-arrow-repeat"></i>
+            <a href="/admin/guest/delete?id=${row.id}" class="btn btn-danger">
+              <i class="bi bi-trash-fill"></i>
             </a>
           `;
         }
       },
       {
-        data: 'payment_date',
+        data: 'paydate',
         className: 'd-none'
       },
       {
         render(data, type, row, meta) {
-          return DateTime.fromSQL(row.payment_date).toFormat('MMMM dd, yyyy');
+          return DateTime.fromISO(row.paydate).toFormat('MMMM dd, yyyy');
         }
       },
       {
-        render(data, type, row, meta) {
-          return `<i class="bi bi-currency-rupee"></i><span>${row.total_amount}</span>`;
-        }
+        data: 'name'
+      },
+      {
+        data: 'paymode'
       },
       {
         render(data, type, row, meta) {
-          return row.status.toUpperCase();
+          return `<i class="bi bi-currency-rupee"></i><span>${row.payamount}</span>`;
         }
-      },
-      {
-        render(data, type, row, meta) {
-          return `<i class="bi bi-currency-rupee"></i><span>${row.paid_amount}</span>`;
-        }
-      },
-
-      {
-        render(data, type, row, meta) {
-          return `<i class="bi bi-currency-rupee"></i><span>${row.online}</span>`;
-        }
-      },
-      {
-        render(data, type, row, meta) {
-          return `<i class="bi bi-currency-rupee"></i><span>${row.cash}</span>`;
-        }
-      },
-      {
-        render(data, type, row, meta) {
-          const total = Number.parseFloat(row.total_amount);
-          const paid = Number.parseFloat(row.paid_amount);
-          const remaning = total - paid;
-          return `<i class="bi bi-currency-rupee"></i><span>${remaning}</span>`;
-        }
-      },
+      }
     ]
   });
 
   $.ajax({
-    url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
+    url: '/admin/guest/list',
     method: 'get',
   }).done(rs => console.log(rs));
 </script>

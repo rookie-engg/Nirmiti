@@ -165,19 +165,19 @@ Subscription.init({
   },
 
   remaining_days: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.FLOAT(4, 2),
     allowNull: false,
     validate: {
       notNull: true,
       notEmpty: true,
-      isInt: true,
+      isNumeric: true,
     },
   },
   sub_type: {
-    type: DataTypes.ENUM('lunch', 'lunch-dinner'),
+    type: DataTypes.ENUM('single', 'both'),
     allowNull: false,
     validate: {
-      isIn: [['lunch', 'lunch-dinner']],
+      isIn: [['single', 'both']],
     },
   },
   status: {
@@ -190,6 +190,17 @@ Subscription.init({
 }, {
   sequelize: dbInstance,
   // tableName: 'subscription', 
+  timestamps: true,
+  createdAt: false
+});
+
+export class Activity extends Model { };
+
+Activity.init({
+  last_active: DataTypes.STRING(40),
+  last_count: DataTypes.TINYINT,
+}, {
+  sequelize: dbInstance,
   timestamps: false
 });
 
@@ -197,10 +208,6 @@ export class Guest extends Model { };
 
 Guest.init({
   name: DataTypes.STRING(80),
-  email: DataTypes.STRING,
-  txnid: {
-    type: DataTypes.STRING(30),
-  },
   paymode: {
     type: DataTypes.ENUM('online', 'cash'),
     allowNull: false,
@@ -261,6 +268,16 @@ Absent.init({
   // tableName: 'absent'
 });
 
+// export class Messtiming extends Model { };
+
+// Messtiming.init({
+//   title: DataTypes.STRING,
+//   time: DataTypes.TIME,
+// }, {
+//   sequelize: dbInstance,
+//   timestamps: false,
+// });
+
 Customer.hasOne(Contact);
 Contact.belongsTo(Customer);
 
@@ -276,6 +293,9 @@ Complaint.belongsTo(Customer);
 Customer.hasMany(Absent);
 Absent.belongsTo(Customer);
 
+Customer.hasOne(Activity);
+Activity.belongsTo(Customer);
+
 export const models = {
   customer: Customer,
   subscription: Subscription,
@@ -284,6 +304,6 @@ export const models = {
   absent: Absent,
   complaint: Complaint,
   contact: Contact,
+  activity: Activity,
+  // messtiming: Messtiming
 };
-
-

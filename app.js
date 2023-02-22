@@ -29,7 +29,7 @@ app.set('env', 'development');
 app.set('views', fileURLToPath(new URL('./views', import.meta.url)));
 app.set('view engine', 'hbs');
 
-app.use(logger);
+// app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(expressSession({

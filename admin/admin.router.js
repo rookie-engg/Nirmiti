@@ -4,6 +4,7 @@ import { models } from '../database/models.js';
 import { Worker } from 'node:worker_threads';
 import debug from 'debug';
 import { fileURLToPath } from 'node:url';
+import { DateTime } from 'luxon';
 
 const d = debug('router:admin');
 
@@ -292,7 +293,7 @@ adminRouter.post('/customer/update/profile',
 
 adminRouter.get('/customer/update/show', async (req, res, next) => {
 
-  const ugnumber = req.query?.ugnumber.toUpperCase();
+  const ugnumber = req.query?.ugnumber;
 
   if (!ugnumber) {
     res.status(400).render('admin-update-customer', {
@@ -306,7 +307,7 @@ adminRouter.get('/customer/update/show', async (req, res, next) => {
 
     const data = await models.customer.findOne({
       where: {
-        ug_number: ugnumber,
+        ug_number: ugnumber.toUpperCase(),
       },
       include: [models.contact, models.subscription, models.payment]
     });
@@ -340,7 +341,7 @@ adminRouter.get('/customer/payments', (req, res, next) => {
 });
 
 adminRouter.get('/customer/payments/show', async (req, res, next) => {
-  const ugnumber = req.query?.ugnumber.toUpperCase();
+  const ugnumber = req.query?.ugnumber;
 
   if (!ugnumber) {
     res.status(400).render('admin-customer-payments', {
@@ -354,7 +355,7 @@ adminRouter.get('/customer/payments/show', async (req, res, next) => {
 
     const data = await models.customer.findOne({
       where: {
-        ug_number: ugnumber,
+        ug_number: ugnumber.toUpperCase(),
       },
     });
 
@@ -369,7 +370,7 @@ adminRouter.get('/customer/payments/show', async (req, res, next) => {
 });
 
 adminRouter.get('/customer/payments/list', async (req, res, next) => {
-  const ugnumber = req.query?.ugnumber.toUpperCase();
+  const ugnumber = req.query?.ugnumber;
 
   if (!ugnumber) {
     res.status(400).render('admin-customer-payments', {
@@ -383,7 +384,7 @@ adminRouter.get('/customer/payments/list', async (req, res, next) => {
 
     const data = await models.customer.findOne({
       where: {
-        ug_number: ugnumber,
+        ug_number: ugnumber.toUpperCase(),
       },
       include: [models.payment]
     });
@@ -398,7 +399,7 @@ adminRouter.get('/customer/payments/list', async (req, res, next) => {
 });
 
 adminRouter.get('/customer/payments/update', async (req, res, next) => {
-  const ugnumber = req.query?.ugnumber.toUpperCase();
+  const ugnumber = req.query?.ugnumber;
 
   if (!ugnumber) {
     res.status(400).render('admin-customer-payments', {
@@ -422,7 +423,7 @@ adminRouter.get('/customer/payments/update', async (req, res, next) => {
 
     const customer = await models.customer.findOne({
       where: {
-        ug_number: ugnumber,
+        ug_number: ugnumber.toUpperCase(),
       },
       include: [models.payment],
     });
@@ -478,7 +479,7 @@ adminRouter.post('/customer/payment/update',
       console.table(errors.array());
       return;
     }
-    
+
 
     try {
       const payments = await customer.getPayments({
@@ -529,13 +530,40 @@ adminRouter.post('/customer/payment/update',
 
 // ---------- /guest Routes Start -----------
 
-adminRouter.get('/guest', (_req, res, next) => {
+adminRouter.get('/guest/add', (_req, res, next) => {
   res.render('admin-guest');
+});
+
+adminRouter.get('/guest/table', (req, res, next) => {
+  res.render('admin-guest-table');
+});
+
+adminRouter.get('/guest/list', async (req, res, next) => {
+  try {
+    const guests = await models.guest.findAll();
+    res.status(200).json({ data: guests.map(guest => guest.toJSON()) });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+adminRouter.get('/guest/delete', async (req, res, next) => {
+  if (!req.query?.id) {
+    res.status(400).render('admin-guest-table', { err: true, message: 'Invalid Id given' });
+    return;
+  }
+
+  try {
+    await models.guest.destroy({ where: { id: req.query.id } });
+    res.status(200).render('admin-guest-table', { success: true, message: 'Delete Success' });
+  } catch (err) {
+    res.status(500).render('admin-guest-table', { err: true, message: err.message });
+  }
+
 });
 
 adminRouter.post('/guest/add',
   body('name').notEmpty().trim(),
-  body('email').isEmail().trim(),
   body('payamount').notEmpty().isNumeric().trim(),
   body('paydate').isDate().trim(),
   body('paymode').notEmpty().trim(),
@@ -573,7 +601,6 @@ adminRouter.post('/guest/add',
 
   });
 
-export default adminRouter;
 
 // --------- /guest routes -----------
 
@@ -582,3 +609,171 @@ export default adminRouter;
 adminRouter.get('/attendance', (req, res, next) => {
   res.render('admin-attendance');
 });
+
+adminRouter.get('/attendance/mark', async (req, res, next) => {
+  const ugnumber = req.query?.ugnumber;
+
+  if (!ugnumber) {
+    res.render('admin-attendance', { err: true, message: 'Invalid UG Number' });
+    return;
+  }
+
+  let currentDateTimeISO = req.query?.currentDateTimeISO;
+  if (!currentDateTimeISO) {
+    res.render('admin-attendance', { err: true, message: 'Invalid Current Date TIme ISO' });
+    return;
+  }
+
+  try {
+    const customer = await models.customer.findOne({
+      where: { ug_number: ugnumber.toUpperCase() },
+      include: [models.subscription, models.activity]
+    });
+
+    if (!customer) {
+      res.status(200).render('admin-attendance', {
+        err: true,
+        message: `Reg Number ${ugnumber} Does't exists`
+      });
+      return;
+    }
+    const remaningDays = Number.parseFloat(customer.Subscription.remaining_days);
+    if (remaningDays <= 0) {
+      res.render('admin-attendance', {
+        modal: true,
+        message: ugnumber.toString() + ' Subscription Expired Please Re-new',
+      });
+      return;
+    }
+
+    const status = customer.Subscription.status;
+    if (status === 'inactive') {
+      res.render('admin-attendance', {
+        modal: true,
+        message: ugnumber.toString() + 'Has Status:"IN-ACTIVE" Please Set status active',
+      });
+      return;
+    }
+
+    const subType = customer.Subscription.sub_type;
+    const dateNow = DateTime.fromISO(DateTime.fromISO(currentDateTimeISO).toISODate());
+    console.log(dateNow.toISODate());
+
+    let lastDate = customer.Activity.last_active;
+    let lastCount = customer.Activity.last_count;
+    if (!lastDate) {
+      // set last date to previous date 
+      lastDate = dateNow.minus({ day: 1 });
+    }
+    if (!lastCount) {
+      lastCount = 0;
+    }
+
+    lastDate = DateTime.fromISO(lastDate);
+    lastCount = Number.parseInt(lastCount);
+
+    // same day
+    if (dateNow.equals(lastDate)) {
+      // if daily quota is exausted for single time customer
+      if (subType === 'single' && lastCount == 1) {
+        res.render('admin-attendance', {
+          modal: true,
+          message: `Attendance already marked!\n Daily Quota Over For ${ugnumber} SINGLE TIME`
+        });
+        return;
+      }
+      // if daily quota is exausted for both lunch & dinner customer
+      if (subType === 'both' && lastCount == 2) {
+        res.render('admin-attendance', {
+          modal: true,
+          message: `Daily Quota Over For ${ugnumber} BOTH times`,
+        })
+        return;
+      }
+
+      // mark attendance for single time customer
+      if (subType === 'single' && lastCount === 0) {
+        lastCount = 1;
+        customer.Activity.set({ last_count: lastCount });
+
+        // reduce remaning days by 1
+        const remaningDays = Number.parseFloat(customer.Subscription.remaining_days);
+        customer.Subscription.set({ remaining_days: remaningDays - 1 });
+
+        await Promise.all([customer.Subscription.save(), customer.save(), customer.Activity.save()]);
+
+        res.render('admin-attendance', {
+          success: true,
+          message: 'Attenedance Marked for ' + ugnumber,
+        });
+        return;
+      }
+
+      // mark attendance for both time customer
+      if (subType === 'both') {
+        const lunchTime = DateTime.fromISO(currentDateTimeISO).set({ hour: 12, minute: 0, second: 0 });
+        const dinnerTime = DateTime.fromISO(currentDateTimeISO).set({ hour: 18, minute: 0, second: 0 });
+        const dateTimeNow = DateTime.fromISO(currentDateTimeISO);
+
+        if ((lunchTime < dateTimeNow < dinnerTime) && lastCount == 1) {
+          res.render('admin-attendance', {
+            modal: true,
+            message: 'Already Attendance Mark for Lunch time for ' + ugnumber,
+          });
+          return;
+        }
+
+        if ((dinnerTime < dateTimeNow) && lastCount == 2) {
+          res.render('admin-attendance', {
+            modal: true,
+            message: 'Already Attendance Mark for Dinner time for ' + ugnumber,
+          });
+          return;
+        }
+        lastCount = lastCount + 1;
+        customer.Activity.set({ last_count: lastCount });
+
+        // reduce remaning days by 1
+        const remaningDays = Number.parseFloat(customer.Subscription.remaining_days);
+        customer.Subscription.set({ remaining_days: remaningDays - 0.5 });
+
+        await Promise.all([customer.Subscription.save(), customer.save(), customer.Activity.save()]);
+
+        res.render('admin-attendance', {
+          success: true,
+          message: 'Attenedance Marked for ' + ugnumber,
+        });
+        return;
+
+      }
+    }
+    // new day
+    else {
+      lastCount = 1;
+      lastDate = dateNow;
+      customer.Activity.set({ last_count: lastCount, last_active: dateNow.toISODate() });
+
+      const remaningDays = Number.parseFloat(customer.Subscription.remaining_days);
+
+      if (subType === 'single') {
+        customer.Subscription.set({ remaining_days: remaningDays - 1 });
+      } else {
+        customer.Subscription.set({ remaining_days: remaningDays - 0.5 });
+      }
+
+      await Promise.all([customer.Subscription.save(), customer.save(), customer.Activity.save()]);
+
+      res.render('admin-attendance', {
+        success: true,
+        message: 'Attenedance Marked for ' + ugnumber,
+      });
+      return;
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('admin-attendance', { err: true, message: err.message });
+  }
+});
+
+export default adminRouter;
