@@ -1,0 +1,164 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down  ms-auto"></i>
+      </a>
+      <ul id="guest-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/guest/add">
+            <i class="bi bi-circle"></i><span>Add Guest</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/guest/table">
+            <i class="bi bi-circle"></i><span>List Guest</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#sub-nav" data-bs-toggle="collapse" href="#">
+        <i class='bx bxs-wallet-alt'></i><span>Subscription</span><i class="bi bi-chevron-down  ms-auto"></i>
+      </a>
+      <ul id="sub-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/subscription/show" class="active">
+            <i class="bi bi-circle"></i><span>Show subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/renew">
+            <i class="bi bi-circle"></i><span>Renew subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/status">
+            <i class="bi bi-circle"></i><span>Change Status</span>
+          </a>
+        </li>
+      </ul>
+    </li><!-- End Dashboard Nav -->
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/reports">
+        <i class='bx bxs-report'></i>
+        <span>Reports</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+<main class="main" id="main">
+  <div class="pagetitle">
+    <h1>Subscription</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/home">Home</a></li>
+        <li class="breadcrumb-item">Subscription</li>
+        <li class="breadcrumb-item active"><a href="/admin/subscription/show">Show</a></li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Subscription Details</h5>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>Ug number</h5>
+        </div>
+        <div class="col-lg-6">{{data.ug_number}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>Name</h5>
+        </div>
+        <div class="col-lg-6">{{data.first_name}} {{data.last_name}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>joning date</h5>
+        </div>
+        <div class="col-lg-6">{{data.joining_date}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>subscription plan</h5>
+        </div>
+        <div class="col-lg-6">{{data.Subscription.number_of_days}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>last renew date</h5>
+        </div>
+        <div class="col-lg-6">{{data.Subscription.renew_date}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>remaning days</h5>
+        </div>
+        <div class="col-lg-6">{{data.Subscription.remaining_days}}</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>subscription type</h5>
+        </div>
+        <div class="col-lg-6">{{data.Subscription.sub_type}} time</div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-lg-2">
+          <h5>status</h5>
+        </div>
+        <div class="col-lg-6"><b>{{data.Subscription.status}}</b></div>
+      </div>
+    </div>
+  </div>
+</main>

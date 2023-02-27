@@ -3,14 +3,17 @@ import { models } from './database/models.js';
 import dbInstance from './database/connect.js';
 import { DateTime } from 'luxon';
 
-export async function insertDummyData(run = 200) {
+export async function insertDummyData(run = 5) {
 
   const customers = [];
   const guests = [];
 
   for (let x = 0; x < run; x++) {
-    const amount = faker.helpers.arrayElement(['2400', '1600']);
-    const online = faker.datatype.number({ min: 0, max: Number.parseFloat(amount) });
+    const messPlan = faker.datatype.number({ max: 30, min: 12 });
+    const amount = messPlan * 40;
+    const paidAmount = faker.helpers.arrayElement([amount, faker.datatype.number({ min: 0, max: amount })]);
+    const online = faker.datatype.number({ min: 0, max: paidAmount });
+    const cash = paidAmount - online;
     customers.push({
       ug_number: `UG` + `${x + 1}`.padStart(4, '0'),
       first_name: faker.name.firstName(),
@@ -25,8 +28,8 @@ export async function insertDummyData(run = 200) {
         guardian_phone: faker.phone.number('##########'),
       },
       Subscription: {
-        number_of_days: faker.helpers.arrayElement([30, 31]),
-        renew_date: faker.date.soon(),
+        number_of_days: 30,
+        renew_date: faker.date.past(),
         remaining_days: faker.datatype.number({ min: 1, max: 30 }),
         sub_type: faker.helpers.arrayElement(['both', 'both']),
         status: 'active',
@@ -35,13 +38,14 @@ export async function insertDummyData(run = 200) {
         last_active: faker.helpers.arrayElement([null]),//, DateTime.now().toISODate()]),
         last_count: faker.helpers.arrayElement([null]),
       },
-      Payments: new Array(15).fill(null).map(e => {
+      Payments: new Array(5).fill(null).map(e => {
         return {
-          total_amount: 2400,
-          paid_amount: amount,
+          total_amount: amount,
+          paid_amount: paidAmount,
           cash: online,
-          status: amount ? 'pending' : 'complete',
-          online: Number.parseFloat(amount) - online,
+          status: amount == paidAmount ? 'complete' : 'pending',
+          online: paidAmount,
+          cash,
           payment_date: faker.date.recent(),
           txnid: faker.random.alphaNumeric(10),
         }

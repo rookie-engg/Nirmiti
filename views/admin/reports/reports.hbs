@@ -47,17 +47,17 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down ms-auto"></i>
+      <a class="nav-link collapsed" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down  ms-auto"></i>
       </a>
-      <ul id="guest-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+      <ul id="guest-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/guest/add">
             <i class="bi bi-circle"></i><span>Add Guest</span>
           </a>
         </li>
         <li>
-          <a href="/admin/guest/table" class="active">
+          <a href="/admin/guest/table">
             <i class="bi bi-circle"></i><span>List Guest</span>
           </a>
         </li>
@@ -85,9 +85,10 @@
           </a>
         </li>
       </ul>
-    </li><!-- End Dashboard Nav -->
-     <li class="nav-item">
-      <a class="nav-link collapsed" href="/admin/reports">
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link active" href="/admin/reports">
         <i class='bx bxs-report'></i>
         <span>Reports</span>
       </a>
@@ -100,101 +101,59 @@
 
 <main class="main" id="main">
   <div class="pagetitle">
-    <h1>Guest Payments</h1>
+    <h1>Reports</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/home">Home</a></li>
+        <li class="breadcrumb-item active">Reports</li>
+      </ol>
+    </nav>
   </div><!-- End Page Title -->
 
   <section class="section">
-    <div class="row">
-      <div class="col-lg-12">
+    <div class="row mb-3">
+      <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Guest</h5>
-
-            {{#if success}}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <i class="bi bi-check-circle me-1"></i>
-              {{message}}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="card-title">New Customers</div>
+            <div class="row mb-3">
+              <div class="col-sm-12">
+                <p class="card-text">Lists all the new customers jonied between gives dates</p>
+              </div>
             </div>
-            {{/if}}
-
-            {{#if err}}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <i class="bi bi-exclamation-octagon me-1"></i>
-              {{message}}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <form action="/admin/reports/new-customers" method="get" class="row mb-3">
+              <div class="input-group col-sm mb-3">
+                <input type="date" class="form-control" placeholder="select starting date" name="startDate" required>
+                <span class="input-group-text">to</span>
+                <input type="date" class="form-control" aria-placeholder="select ending date" name="endDate" required>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-2">
+                  <button class="btn btn-success" type="submit">Genrate</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title">Pending Payment</div>
+            <div class="row mb-3">
+              <div class="col-sm-10 mb-3">
+                <p class="card-text">Lists all the customers which have some pending amount and payment status set to
+                  pending</p>
+              </div>
             </div>
-            {{/if}}
-
-            <!-- Default Table -->
-            <table id="payments-table" class="table table-striped" style="width:100%">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Raw Date</th>
-                  <th scope="col">Readable PayDate</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Pay Mode</th>
-                  <th scope="col">Paid Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-            <!-- End Default Table Example -->
+            <div class="row mb-3">
+              <div class="col-sm-2">
+                <a href="/admin/reports/pending-payments" class="btn btn-primary">Genrate</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 </main>
-
-<script type="module">
-  import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.2.1/+esm';
-
-  const table = $('#payments-table').DataTable({
-    ajax: {
-      url: '/admin/guest/list',
-      method: 'get',
-      dataSrc: 'data'
-    },
-    scrollX: true,
-    order: [['0', 'desc']],
-    columns: [
-      {
-        render(data, type, row, meta) {
-          return `
-            <a href="/admin/guest/delete?id=${row.id}" class="btn btn-danger">
-              <i class="bi bi-trash-fill"></i>
-            </a>
-          `;
-        }
-      },
-      {
-        data: 'paydate',
-        className: 'd-none'
-      },
-      {
-        render(data, type, row, meta) {
-          return DateTime.fromISO(row.paydate).toFormat('MMMM dd, yyyy');
-        }
-      },
-      {
-        data: 'name'
-      },
-      {
-        data: 'paymode'
-      },
-      {
-        render(data, type, row, meta) {
-          return `<i class="bi bi-currency-rupee"></i><span>${row.payamount}</span>`;
-        }
-      }
-    ]
-  });
-
-  $.ajax({
-    url: '/admin/guest/list',
-    method: 'get',
-  }).done(rs => console.log(rs));
-</script>

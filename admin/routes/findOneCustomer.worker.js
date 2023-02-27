@@ -1,5 +1,5 @@
 import { workerData, parentPort } from 'node:worker_threads';
-import { models } from '../database/models.js';
+import { models } from '../../database/models.js';
 
 process.on('exit', () => process.exit());
 

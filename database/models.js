@@ -60,7 +60,7 @@ Customer.init({
   sequelize: dbInstance,
   // tableName: 'customer',
   paranoid: true,
-  timestamps: false,
+  timestamps: true,
 });
 
 
@@ -113,7 +113,7 @@ Payment.init({
 }, {
   sequelize: dbInstance,
   // tableName: 'payment',
-  updatedAt: false,
+  timestamps: true,
 });
 
 export class Contact extends Model { };
@@ -140,7 +140,7 @@ Contact.init({
 }, {
   sequelize: dbInstance,
   // tableName: 'contact',
-  timestamps: false
+  timestamps: true
 });
 
 export class Subscription extends Model { };
@@ -191,7 +191,6 @@ Subscription.init({
   sequelize: dbInstance,
   // tableName: 'subscription', 
   timestamps: true,
-  createdAt: false
 });
 
 export class Activity extends Model { };
@@ -201,7 +200,7 @@ Activity.init({
   last_count: DataTypes.TINYINT,
 }, {
   sequelize: dbInstance,
-  timestamps: false
+  timestamps: true
 });
 
 export class Guest extends Model { };
@@ -224,7 +223,6 @@ Guest.init({
   sequelize: dbInstance,
   //  tableName: 'guest',
   timestamps: true,
-  updatedAt: false,
 });
 
 export class Complaint extends Model { };
@@ -243,7 +241,7 @@ Complaint.init({
 }, {
   sequelize: dbInstance,
   // tableName: 'complaint',
-  updatedAt: false
+  timestamps: true,
 });
 
 export class Absent extends Model { };
@@ -266,6 +264,7 @@ Absent.init({
 }, {
   sequelize: dbInstance,
   // tableName: 'absent'
+  timestamps: true,
 });
 
 // export class Messtiming extends Model { };

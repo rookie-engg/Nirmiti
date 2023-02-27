@@ -21,9 +21,9 @@ const logger = morgan('dev');
 
 // syncing database models
 await dbInstance.drop();
-dseq('Database authenticated')
+dseq('Database authenticated');
 await dbInstance.sync({ force: true });
-await insertDummyData(200);
+await insertDummyData(500);
 
 app.set('env', 'development');
 app.set('views', fileURLToPath(new URL('./views', import.meta.url)));

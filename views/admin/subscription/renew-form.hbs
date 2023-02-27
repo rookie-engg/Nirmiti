@@ -21,7 +21,7 @@
       <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
-      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/customer/add">
             <i class="bi bi-circle"></i><span>Add Customer</span>
@@ -39,7 +39,7 @@
         </li>
 
         <li>
-          <a href="/admin/customer/payments" class="active">
+          <a href="/admin/customer/payments">
             <i class="bi bi-circle"></i><span>Payments</span>
           </a>
         </li>
@@ -68,14 +68,14 @@
       <a class="nav-link collapsed" data-bs-target="#sub-nav" data-bs-toggle="collapse" href="#">
         <i class='bx bxs-wallet-alt'></i><span>Subscription</span><i class="bi bi-chevron-down  ms-auto"></i>
       </a>
-      <ul id="sub-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+      <ul id="sub-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/subscription/show">
             <i class="bi bi-circle"></i><span>Show subscription</span>
           </a>
         </li>
         <li>
-          <a href="/admin/subscription/renew">
+          <a href="/admin/subscription/renew" class="active">
             <i class="bi bi-circle"></i><span>Renew subscription</span>
           </a>
         </li>
@@ -86,32 +86,34 @@
         </li>
       </ul>
     </li><!-- End Dashboard Nav -->
-     <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link collapsed" href="/admin/reports">
         <i class='bx bxs-report'></i>
         <span>Reports</span>
       </a>
     </li><!-- End Dashboard Nav -->
-
   </ul>
 
 </aside>
 <!-- End Sidebar-->
 
-
 <main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Subscription</h1>
+  </div><!-- End Page Title -->
+
   <section class="section">
     <div class="row">
-      <div class="col-lg-12">
+      <div class="col-lg-6">
 
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Customer Payments</h5>
+            <h5 class="card-title">Renew Subscription</h5>
 
             {{#if success}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
-              {{message}}
+              {{{message}}}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {{/if}}
@@ -119,7 +121,7 @@
             {{#if err}}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
               <i class="bi bi-exclamation-octagon me-1"></i>
-              {{message}}
+              {{{message}}}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {{/if}}
@@ -129,10 +131,10 @@
             </script>
 
             <!-- General Form Elements -->
-            <form action="/admin/customer/payments/show" method="get">
+            <form action="/admin/subscription/renew/show" method="get">
               <div class="row mb-3">
-                <label for="ugnumber" class="col-sm-2 col-form-label">UG number</label>
-                <div class="col-sm-10">
+                <label for="ugnumber" class="col-sm-3 col-form-label">UG number</label>
+                <div class="col-sm">
                   <input type="text" class="form-control" id="ugnumber" name="ugnumber" maxlength="20" required
                     placeholder="Customer UG number" style="text-transform: uppercase;" value="" autofocus />
                   <div class="invalid-feedback">Does not exists</div>
@@ -141,8 +143,8 @@
               </div>
 
               <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">Submit Button</label>
-                <div class="col-sm-10">
+                <label class="col-sm-3 col-form-label">Submit Button</label>
+                <div class="col-sm">
                   <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Submit</button>
                 </div>
               </div>

@@ -58,11 +58,41 @@
         </li>
         <li>
           <a href="/admin/guest/table">
-            <i class="bi bi-circle"></i><span>List Customer</span>
+            <i class="bi bi-circle"></i><span>List Guest</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#sub-nav" data-bs-toggle="collapse" href="#">
+        <i class='bx bxs-wallet-alt'></i><span>Subscription</span><i class="bi bi-chevron-down  ms-auto"></i>
+      </a>
+      <ul id="sub-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/subscription/show">
+            <i class="bi bi-circle"></i><span>Show subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/renew">
+            <i class="bi bi-circle"></i><span>Renew subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/status">
+            <i class="bi bi-circle"></i><span>Change Status</span>
           </a>
         </li>
       </ul>
     </li><!-- End Dashboard Nav -->
+     <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/reports">
+        <i class='bx bxs-report'></i>
+        <span>Reports</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+
   </ul>
 
 </aside>
@@ -79,7 +109,7 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Customer</h5>
-            
+
             {{#if success}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
@@ -118,7 +148,7 @@
                   <th scope="col">Paid Amount</th>
                   <th scope="col">Online</th>
                   <th scope="col">Cash</th>
-                  <th scope="col">Remaning Amount</th>
+                  <th scope="col">Pending Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,7 +172,7 @@
       dataSrc: 'data'
     },
     scrollX: true,
-    order: [['0', 'desc']],
+    order: [['1', 'desc']],
     columns: [
       {
         render(data, type, row, meta) {
@@ -198,9 +228,4 @@
       },
     ]
   });
-
-  $.ajax({
-    url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
-    method: 'get',
-  }).done(rs => console.log(rs));
 </script>
