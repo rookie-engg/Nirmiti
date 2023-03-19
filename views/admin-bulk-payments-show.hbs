@@ -33,13 +33,13 @@
           </a>
         </li>
         <li>
-          <a href="/admin/customer/update" class="active">
+          <a href="/admin/customer/update">
             <i class="bi bi-circle"></i><span>Update Customer</span>
           </a>
         </li>
 
         <li>
-          <a href="/admin/customer/payments">
+          <a href="/admin/customer/payments" class="active">
             <i class="bi bi-circle"></i><span>Payments</span>
           </a>
         </li>
@@ -47,10 +47,10 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down  ms-auto"></i>
       </a>
-      <ul id="guest-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/guest/add">
             <i class="bi bi-circle"></i><span>Add Guest</span>
@@ -63,6 +63,7 @@
         </li>
       </ul>
     </li>
+
 
     <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#sub-nav" data-bs-toggle="collapse" href="#">
@@ -86,7 +87,7 @@
         </li>
       </ul>
     </li><!-- End Dashboard Nav -->
-     <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link collapsed" href="/admin/reports">
         <i class='bx bxs-report'></i>
         <span>Reports</span>
@@ -99,15 +100,16 @@
 <!-- End Sidebar-->
 
 <main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Bulk Payments Edit</h1>
+  </div><!-- End Page Title -->
 
   <section class="section">
     <div class="row">
-      <div class="col-lg-6">
-
+      <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Update Customer Profile</h5>
-
+            <h5 class="card-title">Payments</h5>
             {{#if success}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
@@ -123,65 +125,99 @@
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {{/if}}
-
-            <script type="module">
-              // setTimeout(() => document.querySelectorAll('button[data-bs-dismiss=alert]').forEach(b => b.click()), 3500);
-            </script>
-
-            <!-- General Form Elements -->
-            <form action="/admin/customer/update/show" method="get">
+            <form action="/admin/customer/payments/bulk/update" method="get">
               <div class="row mb-3">
-                <label for="ugnumber" class="col-sm-3 col-form-label">UG number</label>
-                <div class="col-sm">
-                  <input type="text" class="form-control" id="ugnumber" name="ugnumber" maxlength="20" required
-                    placeholder="Customer UG number" style="text-transform: uppercase;" value="" autofocus />
-                  <div class="invalid-feedback">Does not exists</div>
-                  <div class="valid-feedback"></div>
+                <label for="bulkUpdateDate" class="col-sm-3 col-form-label">New Paydate</label>
+                <div class="col-sm-4 mb-3">
+                  <input type="date" class="form-control" name="bulkUpdateDate" required />
+                </div>
+                <input type="text" class="d-none" value="{{startDate}}" name="startDate" readonly/>
+                <input type="text" class="d-none" value="{{endDate}}" name="endDate" readonly/>
+                <div class="col-sm-4 mb-3">
+                  <button type="submit" class="btn btn-primary">update</button>
                 </div>
               </div>
-
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Submit Button</label>
-                <div class="col-sm">
-                  <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Submit</button>
-                </div>
-              </div>
-              <script type="module">
-                const ugnumber = document.getElementById('ugnumber');
-                const btn = document.getElementById('submitBtn');
-
-                ugnumber.addEventListener('change', async (ev) => {
-                  try {
-                    const res = await fetch(`/admin/customer/exists?ugnumber=${ugnumber.value}`);
-
-                    if (!res.ok) {
-                      alert('Error While Connecting Server');
-                      console.error(await res.text());
-                      return;
-                    }
-
-                    const result = await res.json();
-
-                    if (result.exists) {
-                      btn.removeAttribute('disabled');
-                      ugnumber.classList.add('is-valid');
-                      ugnumber.classList.remove('is-invalid');
-                    } else {
-                      btn.setAttribute('disabled', 'disabled');
-                      ugnumber.classList.remove('is-valid');
-                      ugnumber.classList.add('is-invalid');
-                    }
-                  } catch (err) {
-                    alert('Some error occured');
-                    console.error(err);
-                  }
-                });
-              </script>
             </form>
+            <!-- Default Table -->
+            <table id="payments-table" class="table table-striped" style="width:100%">
+              <thead>
+                <tr>
+                  <th scope="col">PayDate</th>
+                  <th scope="col">Total Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Paid Amount</th>
+                  <th scope="col">Online</th>
+                  <th scope="col">Cash</th>
+                  <th scope="col">Pending Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+            <!-- End Default Table Example -->
           </div>
         </div>
       </div>
     </div>
   </section>
-
 </main>
+<script type="module">
+  import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.2.1/+esm';
+  $.ajax({
+    url: '/admin/customer/payments/bulk/list?startDate={{startDate}}&endDate={{endDate}}',
+    method: 'get',
+  }).done(res => {
+    console.log(res);
+  })
+
+  const table = $('#payments-table').DataTable({
+    ajax: {
+      url: '/admin/customer/payments/bulk/list?startDate={{startDate}}&endDate={{endDate}}',
+      method: 'get',
+      dataSrc: 'data'
+    },
+    scrollX: true,
+    order: [['1', 'desc']],
+    columns: [
+      {
+        render(data, type, row, meta) {
+          return row.payment_date;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.total_amount}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return row.status.toUpperCase();
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.paid_amount}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.online}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.cash}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          const total = Number.parseFloat(row.total_amount);
+          const paid = Number.parseFloat(row.paid_amount);
+          const remaning = total - paid;
+          return `<i class="bi bi-currency-rupee"></i><span>${remaning}</span>`;
+        }
+      },
+    ]
+  });
+
+</script>

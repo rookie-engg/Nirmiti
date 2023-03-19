@@ -1,8 +1,9 @@
 import express from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, validationResult, query } from 'express-validator';
 import { models } from '../../database/models.js';
 import { Worker } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
+import { Op } from 'sequelize';
 
 const customerRouter = express.Router();
 
@@ -499,6 +500,92 @@ customerRouter.route('/payments/update')
       }
 
     });
+
+customerRouter.route('/payments/bulk/show').get(
+  query('startDate').isDate().trim(),
+  query('endDate').isDate().trim(),
+  async (req, res, next) => {
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+      res.status(400).customerRender('admin-customer-payments', {
+        Berr: true,
+        message: 'Please Provide Proper Query Prameters'
+      });
+      return;
+    }
+
+    res.status(200).customerRender('admin-bulk-payments-show', {
+      startDate: req.query.startDate,
+      endDate: req.query.endDate,
+    });
+  });
+
+customerRouter.route('/payments/bulk/list').get(
+  query('startDate').isDate().trim(),
+  query('endDate').isDate().trim(),
+  async (req, res, next) => {
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+      res.sendStatus(400);
+      return;
+    }
+    try {
+      const payments = await models.payment.findAll({
+        where: {
+          [Op.and]: [{
+            payment_date: {
+              [Op.between]: [req.query.startDate, req.query.endDate],
+            }
+          }]
+        }
+      });
+      res.status(200).json({ data: payments.map(p => p.toJSON()) });
+    } catch (err) {
+      res.status(500).json({ err });
+    }
+  }
+);
+
+customerRouter.get('/payments/bulk/update',
+  query('startDate').isDate().trim(),
+  query('endDate').isDate().trim(),
+  query('bulkUpdateDate').isDate().trim(),
+  async (req, res, next) => {
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+      res.status(400).customerRender('admin-bulk-payments-show', {
+        err: true,
+        message: 'Invalid Dates',
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
+      });
+      return;
+    }
+    try {
+      await models.payment.update({
+        payment_date: req.query.bulkUpdateDate,
+      }, {
+        where: {
+          [Op.and]: [{
+            payment_date: {
+              [Op.between]: [req.query.startDate, req.query.endDate],
+            }
+          }]
+        }
+      });
+      res.status(200).customerRender('admin-customer-payments', {
+        Bsuccess: true,
+        message: 'SuccessFully updated'
+      });
+    } catch (err) {
+      res.status(500).customerRender('admin-bulk-payments-show', {
+        err: true,
+        message: err,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
+      });
+    }
+  });
 
 customerRouter.route('/subscription').get((req, res, next) => {
   res.status(200).customerRender('admin-subscription');

@@ -21,7 +21,7 @@
       <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
-      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+      <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
         <li>
           <a href="/admin/customer/add">
             <i class="bi bi-circle"></i><span>Add Customer</span>
@@ -33,7 +33,7 @@
           </a>
         </li>
         <li>
-          <a href="/admin/customer/update" class="active">
+          <a href="/admin/customer/update">
             <i class="bi bi-circle"></i><span>Update Customer</span>
           </a>
         </li>
@@ -85,11 +85,19 @@
           </a>
         </li>
       </ul>
-    </li><!-- End Dashboard Nav -->
-     <li class="nav-item">
+    </li>
+
+    <li class="nav-item">
       <a class="nav-link collapsed" href="/admin/reports">
         <i class='bx bxs-report'></i>
         <span>Reports</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link active" href="/admin/payments/">
+        <i class='bx bx-rupee'></i>
+        <span>Payments</span>
       </a>
     </li><!-- End Dashboard Nav -->
 
@@ -99,6 +107,9 @@
 <!-- End Sidebar-->
 
 <main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Payments</h1>
+  </div><!-- End Page Title -->
 
   <section class="section">
     <div class="row">
@@ -106,12 +117,12 @@
 
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Update Customer Profile</h5>
+            <h5 class="card-title">Edit Payments</h5>
 
             {{#if success}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
-              {{message}}
+              {{{message}}}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {{/if}}
@@ -119,7 +130,7 @@
             {{#if err}}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
               <i class="bi bi-exclamation-octagon me-1"></i>
-              {{message}}
+              {{{message}}}
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {{/if}}
@@ -129,59 +140,25 @@
             </script>
 
             <!-- General Form Elements -->
-            <form action="/admin/customer/update/show" method="get">
+            <form action="/admin/payments/list" method="get">
               <div class="row mb-3">
-                <label for="ugnumber" class="col-sm-3 col-form-label">UG number</label>
+                <label for="startDate" class="col-sm-3 col-form-label">Start date</label>
                 <div class="col-sm">
-                  <input type="text" class="form-control" id="ugnumber" name="ugnumber" maxlength="20" required
-                    placeholder="Customer UG number" style="text-transform: uppercase;" value="" autofocus />
-                  <div class="invalid-feedback">Does not exists</div>
-                  <div class="valid-feedback"></div>
+                  <input type="date" class="form-control" id="startDate" required />
                 </div>
               </div>
-
               <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Submit Button</label>
+                <label for="endDate" class="col-sm-3 col-form-label">End date</label>
                 <div class="col-sm">
-                  <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Submit</button>
+                  <input type="date" class="form-control" id="endDate" required />
                 </div>
               </div>
-              <script type="module">
-                const ugnumber = document.getElementById('ugnumber');
-                const btn = document.getElementById('submitBtn');
-
-                ugnumber.addEventListener('change', async (ev) => {
-                  try {
-                    const res = await fetch(`/admin/customer/exists?ugnumber=${ugnumber.value}`);
-
-                    if (!res.ok) {
-                      alert('Error While Connecting Server');
-                      console.error(await res.text());
-                      return;
-                    }
-
-                    const result = await res.json();
-
-                    if (result.exists) {
-                      btn.removeAttribute('disabled');
-                      ugnumber.classList.add('is-valid');
-                      ugnumber.classList.remove('is-invalid');
-                    } else {
-                      btn.setAttribute('disabled', 'disabled');
-                      ugnumber.classList.remove('is-valid');
-                      ugnumber.classList.add('is-invalid');
-                    }
-                  } catch (err) {
-                    alert('Some error occured');
-                    console.error(err);
-                  }
-                });
-              </script>
+              <button type="submit" class="btn btn-primary">submit</button>
             </form>
           </div>
         </div>
       </div>
     </div>
   </section>
-
+  
 </main>
