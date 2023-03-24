@@ -51,7 +51,8 @@ app.use('/admin/public', express.static(fileURLToPath(new URL('./admin/public', 
 app.use('/admin', adminRouter);
 
 app.use('/', (req, res, next) => {
-  res.send('<h1>CLient HOME</h1>');
+  // res.send('<h1>CLient HOME</h1>');
+  res.redirect('/admin');
 });
 
 app.use((_req, _res, next) => {
