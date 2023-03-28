@@ -107,6 +107,7 @@ subscriptionRouter.route('/renew/update').post(
   body('online').optional().isNumeric(),
   body('payDate').notEmpty().isDate(),
   body('date').notEmpty().isDate(),
+  body('billNumber').notEmpty().isNumeric(),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -140,6 +141,7 @@ subscriptionRouter.route('/renew/update').post(
       online: req.body.online,
       cash: req.body.cash,
       txnid: req.body.txnid,
+      bill_number: req.body.billNumber,
     });
 
     await Promise.all([customer.Subscription.save(), payment]);

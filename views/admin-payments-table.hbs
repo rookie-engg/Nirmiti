@@ -86,7 +86,7 @@
         </li>
       </ul>
     </li><!-- End Dashboard Nav -->
-     <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link collapsed" href="/admin/reports">
         <i class='bx bxs-report'></i>
         <span>Reports</span>
@@ -143,6 +143,7 @@
                   <th></th>
                   <th>Raw Date</th>
                   <th scope="col">Readable PayDate</th>
+                  <th scope="col">Bill Number</th>
                   <th scope="col">Total Amount</th>
                   <th scope="col">Status</th>
                   <th scope="col">Paid Amount</th>
@@ -191,6 +192,9 @@
         render(data, type, row, meta) {
           return DateTime.fromSQL(row.payment_date).toFormat('MMMM dd, yyyy');
         }
+      },
+      {
+        data: 'bill_number'
       },
       {
         render(data, type, row, meta) {

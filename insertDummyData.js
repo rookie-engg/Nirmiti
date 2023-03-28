@@ -40,6 +40,7 @@ export async function insertDummyData(run = 5) {
       },
       Payments: new Array(5).fill(null).map(e => {
         return {
+          bill_number: faker.helpers.unique(faker.datatype.number),
           total_amount: amount,
           paid_amount: paidAmount,
           cash: online,

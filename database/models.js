@@ -67,6 +67,14 @@ Customer.init({
 export class Payment extends Model { };
 
 Payment.init({
+  bill_number: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      notNull: true,
+      isInt: true,
+    }
+  },
   payment_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
