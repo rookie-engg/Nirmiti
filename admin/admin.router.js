@@ -18,7 +18,7 @@ adminRouter.post('/authenticate', async (req, res, next) => {
   // res.render('admin-login', { layout: false, usernameNotValid: true });
   req.session.name = 'vishal';
   req.session.post = 'clerk';
-  res.redirect('/admin/home');
+  res.redirect('/admin/attendance');
 });
 
 adminRouter.get('/logout', (req, res) => {
