@@ -69,9 +69,9 @@ export class Payment extends Model { };
 Payment.init({
   bill_number: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
-      notNull: true,
+      notNull: false,
       isInt: true,
     }
   },

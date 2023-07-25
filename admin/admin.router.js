@@ -15,9 +15,21 @@ adminRouter.get('/', (req, res, next) => {
 });
 
 adminRouter.post('/authenticate', async (req, res, next) => {
-  // res.render('admin-login', { layout: false, usernameNotValid: true });
+  const { username, password } = req.body;
+  
+  if (username != 'admin') {
+    res.render('admin-login', { layout: false, usernameNotValid: true });
+    return;
+  }
+  
+  if (password != '123') {
+    res.render('admin-login', { layout: false, passwordNotValid: true });
+    return;
+  }
+  
   req.session.name = 'vishal';
   req.session.post = 'clerk';
+
   res.redirect('/admin/attendance');
 });
 

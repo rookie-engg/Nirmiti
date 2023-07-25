@@ -12,4 +12,3 @@ export const dbInstance = new Sequelize({
 })
 
 export default dbInstance;
-
