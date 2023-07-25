@@ -20,16 +20,16 @@ const logger = morgan('dev');
 // const createHttpError = httpError;
 
 // syncing database models
-// await dbInstance.drop();
+await dbInstance.drop();
 dseq('Database authenticated');
-// await dbInstance.sync();
-// await insertDummyData(500);
+await dbInstance.sync();
+await insertDummyData(500);
 
 app.set('env', 'development');
 app.set('views', fileURLToPath(new URL('./views', import.meta.url)));
 app.set('view engine', 'hbs');
 
-// app.use(logger);
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(expressSession({
